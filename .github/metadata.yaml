@@ -1,6 +1,6 @@
 # .github/metadata.yaml
 # Triaged by AI-assisted bulk pass (2026-04-29).
-description: "HTTP redirect for Swift."
+description: "HTTP redirect response handling (3xx status codes and Location header) for Swift."
 topics:
   - foundations
   - http
