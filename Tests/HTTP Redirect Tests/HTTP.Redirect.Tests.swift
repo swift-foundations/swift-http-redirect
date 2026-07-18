@@ -1,27 +1,28 @@
 import HTTP_Redirect
 import HTTP_Standard
 import Server
-import Server_Shared
 import Testing
 
 @Suite("HTTP redirect policies")
 struct RedirectTests {
     private static func headers(_ fields: [(String, String)]) -> HTTP.Headers {
-        HTTP.Headers(fields.map { name, value in
-            HTTP.Header.Field(name: .init(name), value: .init(unchecked: value))
-        })
+        HTTP.Headers(
+            fields.map { name, value in
+                HTTP.Header.Field(name: .init(name), value: .init(unchecked: value))
+            }
+        )
     }
 
     @Test
-    func `canonical host`() async throws(Server_Shared.Server.Error) {
+    func `canonical host`() async throws(Server.Error) {
         let middleware = Redirect.Canonical(host: "www.example.com")
-        let request = Server_Shared.Server.Request(
+        let request = Server.Request(
             method: .get,
             path: ["docs", "intro"],
             query: "page=2",
             headers: Self.headers([
                 ("Host", "example.com"),
-                ("X-Forwarded-Proto", "https")
+                ("X-Forwarded-Proto", "https"),
             ])
         )
 
@@ -36,9 +37,9 @@ struct RedirectTests {
     }
 
     @Test
-    func `canonical host pass through`() async throws(Server_Shared.Server.Error) {
+    func `canonical host pass through`() async throws(Server.Error) {
         let middleware = Redirect.Canonical(host: "www.example.com")
-        let request = Server_Shared.Server.Request(
+        let request = Server.Request(
             method: .get,
             path: ["docs"],
             headers: Self.headers([("Host", "www.example.com")])
@@ -52,14 +53,14 @@ struct RedirectTests {
     }
 
     @Test
-    func `HTTPS redirect`() async throws(Server_Shared.Server.Error) {
+    func `HTTPS redirect`() async throws(Server.Error) {
         let middleware = Redirect.HTTPS(on: true)
-        let request = Server_Shared.Server.Request(
+        let request = Server.Request(
             method: .get,
             path: ["login"],
             headers: Self.headers([
                 ("Host", "example.com"),
-                ("X-Forwarded-Proto", "http")
+                ("X-Forwarded-Proto", "http"),
             ])
         )
 
@@ -74,14 +75,14 @@ struct RedirectTests {
     }
 
     @Test
-    func `HTTPS pass through`() async throws(Server_Shared.Server.Error) {
+    func `HTTPS pass through`() async throws(Server.Error) {
         let middleware = Redirect.HTTPS(on: true)
-        let request = Server_Shared.Server.Request(
+        let request = Server.Request(
             method: .get,
             path: [],
             headers: Self.headers([
                 ("Host", "example.com"),
-                ("X-Forwarded-Proto", "https")
+                ("X-Forwarded-Proto", "https"),
             ])
         )
 

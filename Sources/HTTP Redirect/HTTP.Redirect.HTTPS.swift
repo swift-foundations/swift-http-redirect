@@ -5,13 +5,13 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import Server
-public import Server_Shared
+import HTTP_Standard
 import RFC_6797
+public import Server
 
 extension Redirect {
     /// Permanently redirects HTTP requests to the same resource over HTTPS.
-    public struct HTTPS: Server_Shared.Server.Middleware {
+    public struct HTTPS: Server.Middleware {
         public let on: Bool
 
         // swift-linter:disable:next bool public parameter
@@ -24,9 +24,9 @@ extension Redirect {
 
 extension Redirect.HTTPS {
     public func intercept(
-        _ request: Server_Shared.Server.Request,
-        next: Server_Shared.Server.Responder
-    ) async throws(Server_Shared.Server.Error) -> Server_Shared.Server.Response {
+        _ request: Server.Request,
+        next: Server.Responder
+    ) async throws(Server.Error) -> Server.Response {
         guard on else {
             return try await next(request)
         }
@@ -52,7 +52,7 @@ extension Redirect.HTTPS {
         // swift-linter:disable:next raw value access
         // REASON: the server membrane exposes host values through this typed boundary.
         guard let host = request.headers.first("Host")?.rawValue else {
-            throw Server_Shared.Server.Error.badRequest("Missing Host header")
+            throw Server.Error.badRequest("Missing Host header")
         }
 
         return .redirect(
@@ -62,10 +62,10 @@ extension Redirect.HTTPS {
     }
 }
 
-private extension Redirect.HTTPS {
-    static func location(
+extension Redirect.HTTPS {
+    fileprivate static func location(
         host: String,
-        request: Server_Shared.Server.Request
+        request: Server.Request
     ) -> String {
         var location = "https://\(host)\(request.pathString)"
         if let query = request.query {
